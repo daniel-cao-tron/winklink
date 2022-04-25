@@ -160,16 +160,19 @@ public class CheckDeviation {
       throw new RuntimeException("can get jobUrls");
     }
     List<Long> priceList = Lists.newArrayList();
+    List<String> oraclePrice = Lists.newArrayList();
     for (int i = 0; i < jobs.size(); i++) {
       Map<String, Object> server = config.getNodeServer().get(i);
-      priceList.add(getPrice(
-          String.format("http://%s:%d/job/result/%s",
-              server.get("host"), server.get("port"), jobs.get(i))
-      ));
+      long price = getPrice(
+              String.format("http://%s:%d/job/result/%s",
+                      server.get("host"), server.get("port"), jobs.get(i))
+      );
+      priceList.add(price);
+      oraclePrice.add(server.get("host") + ": " +  price);
     }
     Long[] priceArr = priceList.toArray(new Long[priceList.size()]);
     Arrays.sort(priceArr);
-    log.info("pair: {}, price: {}", pair, priceArr);
+    log.info("pair: {}, price: {}, priceDetail: [{}]", pair, priceArr, String.join(",", oraclePrice));
     return priceArr[priceArr.length / 2];
   }
 
